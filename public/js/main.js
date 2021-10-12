@@ -4,8 +4,7 @@ const peer = new Peer(undefined, {
     host: '/',
     port: '3001'
 });
-let counterAnswer = 0;
-let counterCall = 0;
+
 let peers = {};
 
 peer.on('open', (id) => {
@@ -17,6 +16,7 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then(stream => {
     const video = document.createElement('video');
+    video.muted = true;
     showVideo(video, stream);
     
     peer.on('call', (call) => {
@@ -26,16 +26,7 @@ navigator.mediaDevices.getUserMedia({
             {
                 const video = document.createElement('video');
                 video.id = call.peer;
-                // showVideo(video, remoteStream);
-                video.style.border = '5px solid green';
-                video.muted = true; // mute us but not others
-                video.srcObject = remoteStream;
-
-                // once video loaded
-                video.addEventListener('loadedmetadata', () => {
-                    video.play();
-                });
-                videoGrid.append(video);
+                showVideo(video, remoteStream);
                 peers[call.peer] = call;
             }
             
@@ -43,22 +34,13 @@ navigator.mediaDevices.getUserMedia({
     });
 
     socket.on('user-joined', userId => {
-        console.log(userId);
         const call = peer.call(userId, stream);
-        const video = document.createElement('video');
-        counterCall++;
-        console.log({counterCall});
-        call.on('stream', (remoteStream) => {
-            video.muted = true; // mute us but not others
-            video.id = userId;
-            video.style.border = '5px solid red';
-            video.srcObject = remoteStream;
 
-            // once video loaded
-            video.addEventListener('loadedmetadata', () => {
-                video.play();
-                videoGrid.append(video);
-            });
+        const video = document.createElement('video');
+        video.id = userId;
+        
+        call.on('stream', (remoteStream) => {
+            showVideo(video, remoteStream);
         });
 
         call.on('close', () => {
@@ -68,17 +50,9 @@ navigator.mediaDevices.getUserMedia({
     });
 });
 
-function connectToNewUser(userId, stream)
-{
-    
-}
-
 function showVideo(video, stream)
 {
-    video.muted = true; // mute us but not others
     video.srcObject = stream;
-    video.style.border = '5px solid blue';
-    // once video loaded
     video.addEventListener('loadedmetadata', () => {
         video.play();
         videoGrid.append(video);
@@ -86,7 +60,6 @@ function showVideo(video, stream)
 }
 
 socket.on('user-disconnect', userId => {
-    console.log(`Disconnected: ${userId}` );
     const video = document.getElementById(userId);
     video.remove();
 });
