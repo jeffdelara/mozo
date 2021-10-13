@@ -10,19 +10,11 @@ server.listen(port);
 app.set('view engine', 'ejs');
 app.use(express.static('public')); // use the static folder public
 
-
 // ----------------------------------------------------------------------
-// Static pages
+// Dynamic pages
+
 app.get('/', (req, res) => {
     res.render('index'); // view index.ejs
-});
-
-app.get('/about', (req, res) => {
-    res.render('static/about');
-});
-
-app.get('/contact', (req, res) => {
-    res.render('static/contact');
 });
 
 app.get('/create-room', (req, res) => {
@@ -30,8 +22,6 @@ app.get('/create-room', (req, res) => {
     res.redirect(`/${roomId}`);
 });
 
-// ----------------------------------------------------------------------
-// Dynamic pages
 app.get('/:room', (req, res) => {
     const roomId = req.params.room;
     res.render('room', { roomId: roomId });
@@ -57,4 +47,16 @@ io.on('connection', socket => {
         socket.to(_roomId).emit('user-disconnect', _userId);
         console.log('user disconnected');
     });
+});
+
+
+// ----------------------------------------------------------------------
+// Static pages
+
+app.get('/about', (req, res) => {
+    res.render('static/about');
+});
+
+app.get('/contact', (req, res) => {
+    res.render('static/contact');
 });
