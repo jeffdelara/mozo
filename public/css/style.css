@@ -90,8 +90,9 @@ main#home {
 .spacer {
     background-image: url('../images/bg.svg');
     background-size: cover;
-    height: 100px;
+    height: 200px;
     width: 100%;
+    background-position: center center;
     background-repeat: no-repeat;
 }
 
@@ -147,11 +148,12 @@ section h1 {
     display: inline-block;
     padding: 1rem;
     border-radius: .5rem;
-    background-color: #ffe45e;
-    color: #171d26;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
     text-transform: uppercase;
     text-decoration: none;
     transition: .3s ease-in;
+    font-weight: 700;
 }
 
 #hero .btn:hover {
