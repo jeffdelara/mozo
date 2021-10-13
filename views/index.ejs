@@ -4,11 +4,97 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mozo</title>
+    <title>Mozo - Browser based video chat</title>
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>Welcome to Mozo</h1>
-    <div>The website for video chat. A zoom clone.</div>
-    <a href='/create-room'>Create a room</a>
+
+    <header>
+        <h1><i class='bx bxs-video-recording' ></i> Mozo</h1>
+    </header>
+
+    <main id="home">
+        <section id="hero">
+            <div class="container grid-2">
+                <div>
+                    <h1>Video chat with friends</h1>
+                    <div class="sub">Private, quick and easy video chat on your browser, no login required.</div>
+                    <a href="#" id="create-room" class="btn mt-2">Create a room</a>
+                </div>
+                <div>
+                    <img src="images/hero.png"  alt="">
+                </div>
+            </div>
+        </section>
+
+        <div class="spacer"></div>
+
+        <section class="mt-2">
+            <div class="container">
+                <div id="grid-description">
+                    <div class="grid-item">
+                        <!-- <i class='bx bx-lock-open-alt icon'></i> -->
+                        <i class='bx bx-video-recording icon' ></i>
+                        <h1>Video</h1>
+                        <p>Connections are direct to your friends' computers so we do not save any videos on to our servers.</p>
+                    </div>
+
+                    <div class="grid-item">
+                        <i class='bx bx-chat icon'></i>
+                        <h1>Messaging</h1>
+                        <p>All messages gets deleted after you exit a room because they are direct connections as well.</p>
+                    </div>
+
+                    <div class="grid-item">
+                        <i class='bx bxs-hourglass-top icon'></i>
+                        <h1>Expires</h1>
+                        <p>All sessions, videos and messages will expire once you leave the room.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">&copy; 2021 All rights reserved.</div>
+    </footer>
+
+    <div class="modal">
+        <div class="modal-card">
+            <div class="modal-content">
+                <h3>What is your name?</h3>
+                <form action="/create-room" method="post">
+                    <div><input type="text" placeholder="Enter your name..."></div>
+                    <div>
+                        <button type="reset" class="btn-second" id="modal-cancel">Cancel</button>
+                        <button type="submit" id="modal-join-room">Join room</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const createRoomBtn = document.getElementById('create-room');
+        const body = document.querySelector('body');
+        const modal = document.querySelector('.modal');
+        const modalCancelBtn = document.getElementById('modal-cancel');
+        let isModalOpen = false;
+        
+        createRoomBtn.addEventListener('click', function(){
+            body.style.overflow = 'hidden';
+            modal.classList.add('show');
+            isModalOpen = true;
+        });
+
+        modalCancelBtn.addEventListener('click', function(){
+            if(isModalOpen) {
+                body.style.overflow = 'auto';
+                modal.classList.remove('show');
+                isModalOpen = false;
+            }
+        });
+    </script>
 </body>
 </html>
