@@ -4,8 +4,9 @@ const peer = new Peer(undefined, {
     host: '/',
     port: '3001'
 });
-
 let peers = {};
+
+// Todo: get user's name, emit to server
 
 peer.on('open', (id) => {
     socket.emit('join-room', ROOMID, id);
