@@ -16,6 +16,7 @@ let chatName = localStorage.getItem('name');
 
 peer.on('open', (id) => {
     socket.emit('join-room', ROOMID, id, chatName);
+    localStorage.setItem('room', ROOMID);
 });
 
 // -------------------------------------------------------------------------------

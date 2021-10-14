@@ -82,28 +82,38 @@
         const modalCancelBtn = document.getElementById('modal-cancel');
         const modalJoinBtn = document.getElementById('modal-join-room');
         const modalForm = document.getElementById('modal-form');
+        const nameInput = document.getElementById('name-input');
         let isModalOpen = false;
 
-        modalJoinBtn.addEventListener('click', function(e){
+        const name = localStorage.getItem('name');
+        if(name) {
+            nameInput.value = name;
+        }
+
+        modalJoinBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            // save name in localStorage
-            const nameInput = document.getElementById('name-input');
             const name = nameInput.value;
-            console.log(name);
+
             if(name) {
-                localStorage.setItem('name', name)
-                // submit form
+                localStorage.setItem('name', name);
+                modalForm.submit();
+            }
+        });
+
+        nameInput.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && nameInput.value) {
+                localStorage.setItem('name', name);
                 modalForm.submit();
             }
         });
         
-        createRoomBtn.addEventListener('click', function(){
+        createRoomBtn.addEventListener('click', () => {
             body.style.overflow = 'hidden';
             modal.classList.add('show');
             isModalOpen = true;
         });
 
-        modalCancelBtn.addEventListener('click', function(){
+        modalCancelBtn.addEventListener('click', () => {
             if(isModalOpen) {
                 body.style.overflow = 'auto';
                 modal.classList.remove('show');

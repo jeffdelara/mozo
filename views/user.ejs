@@ -32,7 +32,15 @@
                 localStorage.setItem('name', name);
                 window.location.replace(`/${roomId}`);
             }
-        })
+        });
+
+        nameInput.addEventListener('keydown', (e) => {
+            const name = nameInput.value;
+            if(e.key === 'Enter' && name) {
+                localStorage.setItem('name', name);
+                window.location.replace(`/${roomId}`);
+            }
+        });
     </script>
 </body>
 </html>
