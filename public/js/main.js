@@ -23,7 +23,7 @@ peer.on('open', (id) => {
 // For streaming::
 // get permission to use video and audio
 navigator.mediaDevices.getUserMedia({
-    video: false, 
+    video: true, 
     audio: true
 }).then(stream => {
     const video = document.createElement('video');

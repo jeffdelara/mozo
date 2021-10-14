@@ -43,10 +43,47 @@ h1, h2, h3, h4 {
     line-height: 2rem;
 }
 
+#content {
+    display: grid;
+    background-color: var(--text-color);
+    grid-template-rows: auto 100px;
+}
+
+#video-menu {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.menu-item .bx {
+    font-size: 3rem;
+}
+
+.menu-item {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    color: #3c4452;
+    /* background-color: var(--dark-primary-color); */
+    padding: 1rem;
+    text-align: center;
+    border-radius: .5rem;
+    margin: .3rem;
+    cursor: pointer;
+    transition: .3s ease-in;
+}
+
+.menu-item:hover {
+    color: white;
+}
+
 #video-grid {
     display: flex;
     justify-content: center;
     align-items: center;
+    align-content: center;
     background-color: var(--text-color);
     flex-wrap: wrap;
 }
@@ -57,6 +94,7 @@ video {
     object-fit: cover;
     border-radius: .5rem;
     margin: .5rem;
+    background-color: rgb(34, 42, 53, .3);
 }
 
 #chat {
