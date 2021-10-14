@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a name</title>
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main id="name">
+        <div class="container">
+            <div class="card">
+                <h2>What is your name?</h2>
+                <div><input type="text" id="name-input" name="name" autocomplete="off" required placeholder="Enter your name..."></div>
+                <div>
+                    <button id="modal-join-room">Join room</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const roomId = localStorage.getItem('room');
+        const nameInput = document.getElementById('name-input');
+        const joinBtn = document.getElementById('modal-join-room');
+
+        joinBtn.addEventListener('click', () => {
+            const name = nameInput.value;
+            if(name) {
+                localStorage.setItem('name', name);
+                window.location.replace(`/${roomId}`);
+            }
+        })
+    </script>
+</body>
+</html>

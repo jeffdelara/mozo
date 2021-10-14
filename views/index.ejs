@@ -65,7 +65,7 @@
             <div class="modal-content">
                 <h3>What is your name?</h3>
                 <form id="modal-form" action="/create-room" method="post">
-                    <div><input type="text" name="name" autocomplete="off" placeholder="Enter your name..."></div>
+                    <div><input type="text" id="name-input" name="name" autocomplete="off" placeholder="Enter your name..."></div>
                     <div>
                         <button type="reset" class="btn-second" id="modal-cancel">Cancel</button>
                         <button id="modal-join-room">Join room</button>
@@ -87,8 +87,14 @@
         modalJoinBtn.addEventListener('click', function(e){
             e.preventDefault();
             // save name in localStorage
-            // submit form
-            modalForm.submit();
+            const nameInput = document.getElementById('name-input');
+            const name = nameInput.value;
+            console.log(name);
+            if(name) {
+                localStorage.setItem('name', name)
+                // submit form
+                modalForm.submit();
+            }
         });
         
         createRoomBtn.addEventListener('click', function(){

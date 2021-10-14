@@ -7,13 +7,19 @@ const peer = new Peer(undefined, {
 let peers = {};
 
 // Todo: get user's name, emit to server
+console.log('main.js', localStorage.getItem('name'));
+
+if(!localStorage.getItem('name')) {
+    window.location.replace('/create-name');
+    localStorage.setItem('room', ROOMID);
+}
 
 peer.on('open', (id) => {
-    socket.emit('join-room', ROOMID, id);
+    socket.emit('join-room', ROOMID, id, localStorage.getItem('name'));
 });
 
 navigator.mediaDevices.getUserMedia({
-    video: true, 
+    video: false, 
     audio: true
 }).then(stream => {
     const video = document.createElement('video');
@@ -34,7 +40,8 @@ navigator.mediaDevices.getUserMedia({
         });
     });
 
-    socket.on('user-joined', userId => {
+    socket.on('user-joined', (userId, name) => {
+        notifyChat(name, 'has joined the chat.');
         const call = peer.call(userId, stream);
 
         const video = document.createElement('video');
@@ -51,6 +58,20 @@ navigator.mediaDevices.getUserMedia({
     });
 });
 
+// notifies the chatroom of 
+function notifyChat(name, message)
+{
+    console.log(`${name} ${message}`);
+    const chatBox = document.getElementById('chat-content');
+    const chatItem = document.createElement('div');
+    chatItem.setAttribute('class', 'chat-item');
+    chatItem.innerHTML = `
+        <div class='muted'>${name} ${message}</div>
+    `
+
+    chatBox.append(chatItem);
+}
+
 function showVideo(video, stream)
 {
     video.srcObject = stream;
@@ -60,7 +81,8 @@ function showVideo(video, stream)
     });
 }
 
-socket.on('user-disconnect', userId => {
+socket.on('user-disconnect', (userId, name) => {
+    notifyChat(name, 'has disconnected.');
     const video = document.getElementById(userId);
     video.remove();
 });
