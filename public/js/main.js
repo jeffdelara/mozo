@@ -78,6 +78,7 @@ function notifyChat(name, message)
     `
 
     chatBox.append(chatItem);
+    chatBox.scrollTo(0, chatBox.scrollHeight);
 }
 
 function showVideo(video, stream)
