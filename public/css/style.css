@@ -65,7 +65,11 @@ video {
     padding: 1.8rem;
     font-size: .9rem;
     display: grid;
-    grid-template-rows: auto 80px;
+    grid-template-rows: 85vh auto;
+}
+
+#chat-content {
+    overflow: auto;
 }
 
 #chat-form textarea {
@@ -76,6 +80,7 @@ video {
     width: 100%;
     border: none;
     background-color: #EEE;
+    line-height: 1.4rem;
 }
 
 .chat-item {
@@ -85,6 +90,24 @@ video {
 main#home {
     display: initial;
     height: 100vh;
+}
+
+main#name {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    background-color: white;
+    padding: 1.3rem;
+    width: 500px;
+    text-align: center;
+}
+
+.card h2 {
+    margin: 0;
 }
 
 .spacer {
@@ -205,7 +228,7 @@ footer {
     text-align: center;
 }
 
-.modal input {
+.modal input, input {
     background-color: white;
     outline: none;
     padding: .5rem;
@@ -237,7 +260,7 @@ footer {
     box-shadow: 0px 2px 3px rgba(0, 0, 0, .3);
 }
 
-.modal button {
+.modal button, button {
     cursor: pointer;
     background-color: var(--primary-color);
     border: 2px solid var(--primary-color);
@@ -267,4 +290,9 @@ button.btn-second {
 
 button.btn-second:hover {
     background-color: #EEE;
+}
+
+.muted {
+    color: #555;
+    font-style: italic;
 }

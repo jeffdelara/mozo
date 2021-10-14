@@ -17,7 +17,11 @@ app.get('/', (req, res) => {
     res.render('index'); // view index.ejs
 });
 
-app.get('/create-room', (req, res) => {
+app.get('/create-name', (req, res) => {
+    res.render('user');
+});
+
+app.post('/create-room', (req, res) => {
     const roomId = uuidv4();
     res.redirect(`/${roomId}`);
 });
@@ -35,16 +39,22 @@ io.on('connection', socket => {
     let _userId = null;
     let _roomId = null; 
 
-    socket.on('join-room', (roomId, userId) => {
+    socket.on('join-room', (roomId, userId, name) => {
+        socket.name = name;
         _userId = userId;
         _roomId = roomId;
         console.log({roomId, userId});
         socket.join(roomId);
-        socket.to(roomId).emit('user-joined', userId);
+        socket.to(roomId).emit('user-joined', userId, name);
+    });
+
+    socket.on('chat-message', (name, message) => {
+        io.to(_roomId).emit('chat-broadcast', name, message);
+        console.log({name, message, _roomId});
     });
 
     socket.on('disconnect', () => {
-        socket.to(_roomId).emit('user-disconnect', _userId);
+        socket.to(_roomId).emit('user-disconnect', _userId, socket.name);
         console.log('user disconnected');
     });
 });
