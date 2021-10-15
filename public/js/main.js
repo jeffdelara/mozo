@@ -23,7 +23,7 @@ peer.on('open', (id) => {
 // For streaming::
 // get permission to use video and audio
 navigator.mediaDevices.getUserMedia({
-    video: false, 
+    video: true, 
     audio: true
 }).then(stream => {
     const video = document.createElement('video');
@@ -35,6 +35,7 @@ navigator.mediaDevices.getUserMedia({
     peer.on('call', (call) => {
         call.answer(stream);
         call.on('stream', (remoteStream) => {
+            console.log('STREAM');
             if(!peers[call.peer])
             {
                 const video = document.createElement('video');
@@ -60,6 +61,7 @@ navigator.mediaDevices.getUserMedia({
 
         call.on('close', () => {
             console.log('close');
+            peer.destroy();
             video.remove();
         });
     });

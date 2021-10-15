@@ -9,13 +9,24 @@
     <script>
         const ROOMID = "<%= roomId %>";
     </script>
-    <script src="js/main.js" defer></script>
+    <!-- <script src="js/main.js" defer></script> -->
     <title>Document</title>
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <main>
-        <div id="video-grid">
+        <div id="content">
+            <div id="video-grid">
+                <video src=""></video>
+                <video src=""></video>
+            </div>
+            <div id="video-menu">
+                <div class="menu-item" id="invite-btn"><i class='bx bx-share'></i>  <span id="invite-link"></span>Invite</div>
+                <div class="menu-item"><i class='bx bx-music' ></i> Audio</div>
+                <div class="menu-item"><i class='bx bx-video'></i> Video</div>
+                <div class="menu-item"><i class='bx bx-slideshow'></i> Screen</div>
+            </div>
         </div>
         <div id="chat">
             <div id="chat-content">
@@ -25,6 +36,6 @@
             </div>
         </div>
     </main>
-    
+    <script src="js/events.js" defer></script>
 </body>
 </html>
