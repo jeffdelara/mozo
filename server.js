@@ -26,16 +26,19 @@ app.post('/create-room', (req, res) => {
     res.redirect(`/${roomId}`);
 });
 
+app.get('/rooms', (req, res) => {
+    res.json(getActiveRooms(io));
+});
+
 app.get('/:room', (req, res) => {
     const roomId = req.params.room;
     res.render('room', { roomId: roomId });
 });
 
-
 // ----------------------------------------------------------------------
 // Socket
 io.on('connection', socket => {
-    console.log('connected');
+    
     let _userId = null;
     let _roomId = null; 
 
@@ -70,3 +73,17 @@ app.get('/about', (req, res) => {
 app.get('/contact', (req, res) => {
     res.render('static/contact');
 });
+
+
+// ----------------------------------------------------------------------
+//  Function utils
+function getActiveRooms(io)
+{
+    // create an array of all the (potential) rooms 
+    const arrayOfIds = Array.from(io.sockets.adapter.rooms);
+    // filter if each id does not have a duplicated on the other array since the rooms are those unique id only
+    const filteredIds = arrayOfIds.filter(room => !room[1].has(room[0]));
+    // get only the first items
+    const rooms = filteredIds.map(i => i[0]);
+    return rooms;
+}
