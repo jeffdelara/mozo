@@ -5,6 +5,8 @@ const peer = new Peer(undefined, {
     port: '3001'
 });
 let peers = {};
+let streamConn = null;
+let callConn = null;
 
 // Todo: get user's name, emit to server
 if(!localStorage.getItem('name')) {
@@ -23,9 +25,10 @@ peer.on('open', (id) => {
 // For streaming::
 // get permission to use video and audio
 navigator.mediaDevices.getUserMedia({
-    video: true, 
+    // video: true, 
     audio: true
 }).then(stream => {
+    streamConn = stream;
     const video = document.createElement('video');
     video.muted = true;
     showVideo(video, stream);
@@ -50,7 +53,7 @@ navigator.mediaDevices.getUserMedia({
     // when a new user join, call him
     socket.on('user-joined', (userId, name) => {
         notifyChat(name, 'has joined the chat.');
-        const call = peer.call(userId, stream);
+        const call = peer.call(userId, streamConn);
 
         const video = document.createElement('video');
         video.id = userId;
@@ -69,6 +72,14 @@ navigator.mediaDevices.getUserMedia({
 
 // -------------------------------------------------------------------------------
 //  Utility functions
+
+function toggleCamera()
+{
+    const vid = streamConn.getVideoTracks();
+    vid[0].enabled = !vid[0].enabled;
+    return vid[0].enabled;
+}
+
 // notifies the chatroom of 
 function notifyChat(name, message)
 {

@@ -73,7 +73,6 @@ h1, h2, h3, h4 {
     margin: .3rem;
     cursor: pointer;
     transition: .3s ease-in;
-    position: relative;
 }
 
 .menu-item:hover {
@@ -337,16 +336,26 @@ button.btn-second:hover {
     font-style: italic;
 }
 
-#invite-link {
+#notification {
     border-radius: 3px;
-    position: absolute;
+    position: fixed;
     font-size: .8rem;
     width: auto;
-    top: -50px;
-    left: -30px;
+    bottom: 0;
+    left: 0px;
     z-index: 99;
-    background-color: #2d3541;
+    display: inline-block;
+    padding: 1rem;
+    background-color: var(--primary-color);
     color: var(--secondary-color);
     border: none;
     text-align: center;
+    margin: 2rem;
+    opacity: 0;
+    transition: opacity .3s;
+}
+
+.shownotif {
+    transition: opacity .3s ease-in;
+    opacity: 1 !important;
 }
