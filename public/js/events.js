@@ -1,4 +1,4 @@
-const inviteLink = document.getElementById('invite-link');
+const notification = document.getElementById('notification');
 const link = `${location.protocol}/${location.host}/${ROOMID}`;
 
 const inviteBtn = document.getElementById('invite-btn');
@@ -15,8 +15,19 @@ inviteBtn.addEventListener('click', () => {
 
 function linkNotif(message)
 {
-    inviteLink.innerText = message;
+    notification.innerText = '';
+    notification.innerText = message;
+    notification.classList.add('shownotif');
+
     setTimeout(() => {
-        inviteLink.innerText = '';
+        notification.classList.remove('shownotif');
     }, 3000);
 }
+
+
+const videoBtn = document.getElementById('video-btn');
+videoBtn.addEventListener('click', () => {
+    const cam = toggleCamera();
+    const camStatus = cam ? 'ON' : 'OFF';
+    linkNotif(`Camera turned ${camStatus}`);
+});
