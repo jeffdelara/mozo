@@ -101,10 +101,11 @@ function startScreenShare()
                 });
             });
 
+            toggleCamera();
+
             replaceCamPromise
                 .then((msg) => {
                     console.log(msg);
-                    toggleCamera();
                 })
                 .catch(err => console.log(err));
 
@@ -119,10 +120,11 @@ function stopScreenShare()
         });
     });
 
+    toggleCamera();
+
     replaceScreenPromise
         .then(msg => {
             console.log(msg);
-            toggleCamera();
         })
         .catch(err => console.log(err));
 }
