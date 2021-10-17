@@ -5,8 +5,9 @@ const peer = new Peer(undefined, {
     port: '3001'
 });
 let peers = {};
-let streamConn = null;
-let callConn = null;
+let currentStream = null;
+let camAndAudioStream = null;
+let currentCall = null;
 
 // Todo: get user's name, emit to server
 if(!localStorage.getItem('name')) {
@@ -25,10 +26,11 @@ peer.on('open', (id) => {
 // For streaming::
 // get permission to use video and audio
 navigator.mediaDevices.getUserMedia({
-    // video: true, 
+    video: true, 
     audio: true
 }).then(stream => {
-    streamConn = stream;
+    currentStream = stream;
+    camAndAudioStream = stream;
     const video = document.createElement('video');
     video.muted = true;
     showVideo(video, stream);
@@ -36,7 +38,8 @@ navigator.mediaDevices.getUserMedia({
     // when im the one joining, other users will call me 
     // so this is my answer
     peer.on('call', (call) => {
-        call.answer(stream);
+        currentCall = call;
+        call.answer(currentStream);
         call.on('stream', (remoteStream) => {
             console.log('STREAM');
             if(!peers[call.peer])
@@ -46,14 +49,18 @@ navigator.mediaDevices.getUserMedia({
                 showVideo(video, remoteStream);
                 peers[call.peer] = call;
             }
-            
         });
+
+        currentCall.ontrack = function(event) {
+            console.log('Track', event);
+        }
     });
 
     // when a new user join, call him
     socket.on('user-joined', (userId, name) => {
         notifyChat(name, 'has joined the chat.');
-        const call = peer.call(userId, streamConn);
+        const call = peer.call(userId, currentStream);
+        
 
         const video = document.createElement('video');
         video.id = userId;
@@ -73,16 +80,60 @@ navigator.mediaDevices.getUserMedia({
 // -------------------------------------------------------------------------------
 //  Utility functions
 
+function startScreenShare()
+{
+    const options = {
+        video : { cursor: "always" },
+        audio: true
+    };
+    navigator.mediaDevices.getDisplayMedia(options)
+        .then(displayStream => {
+            displayStream.getVideoTracks()[0].addEventListener('ended', () => {
+                stopScreenShare();
+            });
+
+            const replaceCamPromise = new Promise( (resolve, reject) => {
+                currentCall.peerConnection.getSenders().map( sender => {
+                    resolve(sender.replaceTrack(displayStream.getVideoTracks()[0]));
+                });
+            });
+
+            replaceCamPromise
+                .then((msg) => {
+                    console.log(msg);
+                    toggleCamera();
+                })
+                .catch(err => console.log(err));
+
+        });
+}
+
+function stopScreenShare()
+{
+    const replaceScreenPromise = new Promise((resolve, reject) => {
+        currentCall.peerConnection.getSenders().map(sender => {
+            resolve(sender.replaceTrack(currentStream.getVideoTracks()[0]))
+        });
+    });
+
+    replaceScreenPromise
+        .then(msg => {
+            console.log(msg);
+            toggleCamera();
+        })
+        .catch(err => console.log(err));
+}
+
 function toggleCamera()
 {
-    const vid = streamConn.getVideoTracks();
+    const vid = currentStream.getVideoTracks();
     vid[0].enabled = !vid[0].enabled;
     return vid[0].enabled;
 }
 
 function toggleAudio()
 {
-    const audio = streamConn.getAudioTracks();
+    const audio = currentStream.getAudioTracks();
     audio[0].enabled = !audio[0].enabled;
     return audio[0].enabled;
 }
