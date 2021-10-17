@@ -1,9 +1,12 @@
+// const Peer = require("peerjs");
+
 const videoGrid = document.querySelector('#video-grid');
 var socket = io('/');
-const peer = new Peer(undefined, {
-    host: '/',
-    port: '3001'
-});
+// const peer = new Peer(undefined, {
+//     host: '/',
+//     port: '3001'
+// });
+const peer = new Peer(undefined);
 let peers = {};
 let currentStream = null;
 let camAndAudioStream = null;
@@ -157,8 +160,8 @@ function showVideo(video, stream)
 {
     video.srcObject = stream;
     video.addEventListener('loadedmetadata', () => {
-        video.play();
         videoGrid.append(video);
+        video.play();
     });
 }
 
