@@ -359,3 +359,11 @@ button.btn-second:hover {
     transition: opacity .3s ease-in;
     opacity: 1 !important;
 }
+
+.on {
+    color: var(--primary-color) !important;
+}
+
+.off {
+    color: #3c4452 !important;
+}

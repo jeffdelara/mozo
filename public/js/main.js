@@ -80,6 +80,13 @@ function toggleCamera()
     return vid[0].enabled;
 }
 
+function toggleAudio()
+{
+    const audio = streamConn.getAudioTracks();
+    audio[0].enabled = !audio[0].enabled;
+    return audio[0].enabled;
+}
+
 // notifies the chatroom of 
 function notifyChat(name, message)
 {

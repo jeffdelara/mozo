@@ -30,4 +30,13 @@ videoBtn.addEventListener('click', () => {
     const cam = toggleCamera();
     const camStatus = cam ? 'ON' : 'OFF';
     linkNotif(`Camera turned ${camStatus}`);
+    videoBtn.classList.toggle('on');
+});
+
+const audioBtn = document.getElementById('audio-btn');
+audioBtn.addEventListener('click', () => {
+    const audio = toggleAudio();
+    const audioStatus = audio ? 'ON' : 'OFF'; 
+    linkNotif(`Audio turned ${audioStatus}` );
+    audioBtn.classList.toggle('on');
 });
