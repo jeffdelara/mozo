@@ -9,7 +9,6 @@ var socket = io('/');
 const peer = new Peer(undefined);
 let peers = {};
 let currentStream = null;
-let camAndAudioStream = null;
 let currentCall = null;
 
 // Todo: get user's name, emit to server
@@ -23,6 +22,7 @@ let chatName = localStorage.getItem('name');
 peer.on('open', (id) => {
     socket.emit('join-room', ROOMID, id, chatName);
     localStorage.setItem('room', ROOMID);
+    localStorage.setItem('userId', id);
 });
 
 // -------------------------------------------------------------------------------
@@ -103,6 +103,7 @@ function startScreenShare()
             // Replace current stream with display media
             const myPeers = Object.keys(peers);
             if(myPeers.length > 0) {
+                
                 const replaceCamPromise = new Promise( (resolve, reject) => {
                     for(peerId of myPeers) {
                         peers[peerId].peerConnection.getSenders().map( sender => {
@@ -119,6 +120,10 @@ function startScreenShare()
     
                 toggleCamera();
                 toggleScreenShareButton('ON');
+
+                // tell the others that I'm screensharing
+                const userId = localStorage.getItem('userId');
+                socket.emit('start-screenshare', {roomId: ROOMID, userId: userId, chatName: chatName});
             } 
 
             else {
@@ -149,6 +154,9 @@ function stopScreenShare()
     
     toggleCamera();
     toggleScreenShareButton('OFF');
+
+    const userId = localStorage.getItem('userId');
+    socket.emit('end-screenshare', {roomId: ROOMID, userId: userId, chatName: chatName});
 }
 
 function toggleCamera()
@@ -231,4 +239,17 @@ socket.on('user-disconnect', (userId, name) => {
     notifyChat(name, 'has disconnected.');
     const video = document.getElementById(userId);
     video.remove();
+});
+
+
+// -------------------------------------------------------------------------------
+// Socket events 
+
+// When a peer started to share screen
+socket.on('screenshare-broadcast-start', (chatName, userId) => {
+    console.log(`${chatName} with id of ${userId} is screensharing.`);
+});
+
+socket.on('screenshare-broadcast-end', (chatName, userId) => {
+    console.log(`${chatName} with id of ${userId} Ended screenshare.`);
 });
