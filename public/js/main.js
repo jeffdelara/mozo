@@ -42,8 +42,6 @@ navigator.mediaDevices.getUserMedia({
     // so this is my answer
     peer.on('call', (call) => {
         currentCall = call;
-        // emit event to save peer id
-        // socket.emit('peer-connection', call);
 
         call.answer(currentStream);
         call.on('stream', (remoteStream) => {
