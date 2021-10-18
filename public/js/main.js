@@ -42,6 +42,9 @@ navigator.mediaDevices.getUserMedia({
     // so this is my answer
     peer.on('call', (call) => {
         currentCall = call;
+        // emit event to save peer id
+        // socket.emit('peer-connection', call);
+
         call.answer(currentStream);
         call.on('stream', (remoteStream) => {
             console.log('STREAM');
@@ -63,7 +66,10 @@ navigator.mediaDevices.getUserMedia({
     socket.on('user-joined', (userId, name) => {
         notifyChat(name, 'has joined the chat.');
         const call = peer.call(userId, currentStream);
-        
+
+        if(!peers[call.peer]) {
+            peers[call.peer] = call;
+        }
 
         const video = document.createElement('video');
         video.id = userId;
@@ -91,42 +97,60 @@ function startScreenShare()
     };
     navigator.mediaDevices.getDisplayMedia(options)
         .then(displayStream => {
+
             displayStream.getVideoTracks()[0].addEventListener('ended', () => {
                 stopScreenShare();
             });
 
-            const replaceCamPromise = new Promise( (resolve, reject) => {
-                currentCall.peerConnection.getSenders().map( sender => {
-                    resolve(sender.replaceTrack(displayStream.getVideoTracks()[0]));
+            // Replace current stream with display media
+            const myPeers = Object.keys(peers);
+            if(myPeers.length > 0) {
+                const replaceCamPromise = new Promise( (resolve, reject) => {
+                    for(peerId of myPeers) {
+                        peers[peerId].peerConnection.getSenders().map( sender => {
+                            resolve(sender.replaceTrack(displayStream.getVideoTracks()[0]));
+                        });
+                    }
                 });
-            });
+    
+                replaceCamPromise
+                    .then((msg) => {
+                        console.log(msg);
+                    })
+                    .catch(err => console.log(err));
+    
+                toggleCamera();
+                toggleScreenShareButton('ON');
+            } 
 
-            toggleCamera();
-
-            replaceCamPromise
-                .then((msg) => {
-                    console.log(msg);
-                })
-                .catch(err => console.log(err));
-
+            else {
+                linkNotif('No peers to share screen with.');
+            }
+        })
+        .catch(err => {
+            toggleScreenShareButton('OFF');
         });
 }
 
 function stopScreenShare()
 {
+    const myPeers = Object.keys(peers);
     const replaceScreenPromise = new Promise((resolve, reject) => {
-        currentCall.peerConnection.getSenders().map(sender => {
-            resolve(sender.replaceTrack(currentStream.getVideoTracks()[0]))
-        });
+        for(peerId of myPeers) {
+            peers[peerId].peerConnection.getSenders().map(sender => {
+                resolve(sender.replaceTrack(currentStream.getVideoTracks()[0]))
+            });
+        }
     });
-
-    toggleCamera();
 
     replaceScreenPromise
         .then(msg => {
             console.log(msg);
         })
         .catch(err => console.log(err));
+    
+    toggleCamera();
+    toggleScreenShareButton('OFF');
 }
 
 function toggleCamera()

@@ -40,3 +40,21 @@ audioBtn.addEventListener('click', () => {
     linkNotif(`Audio turned ${audioStatus}` );
     audioBtn.classList.toggle('on');
 });
+
+const shareScreenBtn = document.getElementById('share-screen-btn');
+shareScreenBtn.addEventListener('click', () => {
+    startScreenShare();
+});
+
+function toggleScreenShareButton(screenStatus)
+{
+    linkNotif(`Screen sharing ${screenStatus}`);
+    if(screenStatus === 'OFF') {
+        shareScreenBtn.classList.remove('on');
+    } 
+
+    if(screenStatus === 'ON') {
+        shareScreenBtn.classList.add('on');
+    }
+    
+}

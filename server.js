@@ -56,6 +56,10 @@ io.on('connection', socket => {
         console.log({name, message, _roomId});
     });
 
+    socket.on('peer-connection', (call) => {
+        console.log(call);
+    });
+
     socket.on('disconnect', () => {
         socket.to(_roomId).emit('user-disconnect', _userId, socket.name);
         console.log('user disconnected');
