@@ -56,6 +56,17 @@ io.on('connection', socket => {
         console.log({name, message, _roomId});
     });
 
+    // Screenshare
+    socket.on('start-screenshare', ({roomId, userId, chatName}) => {
+        console.log(roomId, userId, chatName);
+        socket.to(roomId).emit('screenshare-broadcast-start', chatName, userId);
+    });
+
+    socket.on('end-screenshare', ({roomId, userId, chatName}) => {
+        console.log(roomId, userId, chatName);
+        socket.to(roomId).emit('screenshare-broadcast-end', chatName, userId);
+    });
+
     socket.on('disconnect', () => {
         socket.to(_roomId).emit('user-disconnect', _userId, socket.name);
         console.log('user disconnected');

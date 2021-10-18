@@ -9,7 +9,6 @@ var socket = io('/');
 const peer = new Peer(undefined);
 let peers = {};
 let currentStream = null;
-let camAndAudioStream = null;
 let currentCall = null;
 
 // Todo: get user's name, emit to server
@@ -23,6 +22,7 @@ let chatName = localStorage.getItem('name');
 peer.on('open', (id) => {
     socket.emit('join-room', ROOMID, id, chatName);
     localStorage.setItem('room', ROOMID);
+    localStorage.setItem('userId', id);
 });
 
 // -------------------------------------------------------------------------------
@@ -42,15 +42,15 @@ navigator.mediaDevices.getUserMedia({
     // so this is my answer
     peer.on('call', (call) => {
         currentCall = call;
+        const callerName = call.metadata.chatName;
 
         call.answer(currentStream);
         call.on('stream', (remoteStream) => {
-            console.log('STREAM');
             if(!peers[call.peer])
             {
                 const video = document.createElement('video');
                 video.id = call.peer;
-                showVideo(video, remoteStream);
+                showVideo(video, remoteStream, callerName);
                 peers[call.peer] = call;
             }
         });
@@ -60,20 +60,23 @@ navigator.mediaDevices.getUserMedia({
         }
     });
 
+
+
     // when a new user join, call him
     socket.on('user-joined', (userId, name) => {
         notifyChat(name, 'has joined the chat.');
-        const call = peer.call(userId, currentStream);
+        // call new user with my chatName
+        const call = peer.call(userId, currentStream, { metadata: { chatName: chatName } });
 
-        if(!peers[call.peer]) {
-            peers[call.peer] = call;
-        }
-
-        const video = document.createElement('video');
-        video.id = userId;
-        
         call.on('stream', (remoteStream) => {
-            showVideo(video, remoteStream);
+            if(!peers[call.peer]) {
+                console.log('peer call');
+                const video = document.createElement('video');
+                video.id = userId;
+                showVideo(video, remoteStream, name);
+                peers[call.peer] = call;
+            }
+            
         });
 
         call.on('close', () => {
@@ -103,6 +106,7 @@ function startScreenShare()
             // Replace current stream with display media
             const myPeers = Object.keys(peers);
             if(myPeers.length > 0) {
+                
                 const replaceCamPromise = new Promise( (resolve, reject) => {
                     for(peerId of myPeers) {
                         peers[peerId].peerConnection.getSenders().map( sender => {
@@ -119,6 +123,10 @@ function startScreenShare()
     
                 toggleCamera();
                 toggleScreenShareButton('ON');
+
+                // tell the others that I'm screensharing
+                const userId = localStorage.getItem('userId');
+                socket.emit('start-screenshare', {roomId: ROOMID, userId: userId, chatName: chatName});
             } 
 
             else {
@@ -149,6 +157,9 @@ function stopScreenShare()
     
     toggleCamera();
     toggleScreenShareButton('OFF');
+
+    const userId = localStorage.getItem('userId');
+    socket.emit('end-screenshare', {roomId: ROOMID, userId: userId, chatName: chatName});
 }
 
 function toggleCamera()
@@ -180,11 +191,16 @@ function notifyChat(name, message)
     chatBox.scrollTo(0, chatBox.scrollHeight);
 }
 
-function showVideo(video, stream)
+function showVideo(video, stream, chatName = 'You')
 {
     video.srcObject = stream;
+    const div = document.createElement('div');
+    div.innerHTML = `<span>${chatName}</span>`;
+    div.classList.add('vid-container');
+
     video.addEventListener('loadedmetadata', () => {
-        videoGrid.append(video);
+        div.append(video);
+        videoGrid.append(div);
         video.play();
     });
 }
@@ -229,6 +245,34 @@ socket.on('chat-broadcast', (name, message) => {
 // When user disconnects
 socket.on('user-disconnect', (userId, name) => {
     notifyChat(name, 'has disconnected.');
-    const video = document.getElementById(userId);
+    const video = document.getElementById(userId).parentNode;
     video.remove();
+});
+
+
+// -------------------------------------------------------------------------------
+// Socket events 
+
+function changeVideoForScreenShare(userId)
+{
+    
+    const videos = document.querySelectorAll('#video-grid video');
+    videos.forEach(vid => {
+        vid.classList.toggle('mini');
+    });
+
+    const screenSharingUser = document.getElementById(userId);
+    console.log(userId);
+    screenSharingUser.classList.toggle('screensharing');
+}
+
+// When a peer started to share screen
+socket.on('screenshare-broadcast-start', (chatName, userId) => {
+    linkNotif(`${chatName} is screensharing.`);
+    changeVideoForScreenShare(userId);
+});
+
+socket.on('screenshare-broadcast-end', (chatName, userId) => {
+    linkNotif(`${chatName} ended screen share.`);
+    changeVideoForScreenShare(userId);
 });

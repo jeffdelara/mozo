@@ -86,15 +86,45 @@ h1, h2, h3, h4 {
     align-content: center;
     background-color: var(--text-color);
     flex-wrap: wrap;
+    flex-direction: row;
+    padding: 1rem;
+    overflow: hidden;
 }
+
 video {
     max-width: 340px;
     width: 100%;
-    height: 240px;
+    /* height: 240px; */
     object-fit: cover;
-    border-radius: .5rem;
-    margin: .5rem;
+    
     background-color: rgb(34, 42, 53, .3);
+    aspect-ratio: 16 / 9;
+}
+video.mini {
+    max-width: 200px;
+    aspect-ratio: 16 / 9;
+    order: 99;
+}
+video.screensharing {
+    order: 1;
+    aspect-ratio: 16 / 9;
+    max-width: none;
+}
+
+.vid-container {
+    position: relative;
+    margin: .5rem;
+    aspect-ratio: 16 / 9;
+}
+
+.vid-container span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: inline-block;
+    color: white;
+    background-color: rgba(0, 0, 0, .5);
+    padding: .4rem .5rem;
 }
 
 #chat {
@@ -366,4 +396,8 @@ button.btn-second:hover {
 
 .off {
     color: #3c4452 !important;
+}
+
+.hide {
+    visibility: hidden;
 }
