@@ -68,15 +68,15 @@ navigator.mediaDevices.getUserMedia({
         // call new user with my chatName
         const call = peer.call(userId, currentStream, { metadata: { chatName: chatName } });
 
-        if(!peers[call.peer]) {
-            peers[call.peer] = call;
-        }
-
-        const video = document.createElement('video');
-        video.id = userId;
-        
         call.on('stream', (remoteStream) => {
-            showVideo(video, remoteStream, name);
+            if(!peers[call.peer]) {
+                console.log('peer call');
+                const video = document.createElement('video');
+                video.id = userId;
+                showVideo(video, remoteStream, name);
+                peers[call.peer] = call;
+            }
+            
         });
 
         call.on('close', () => {
@@ -245,7 +245,7 @@ socket.on('chat-broadcast', (name, message) => {
 // When user disconnects
 socket.on('user-disconnect', (userId, name) => {
     notifyChat(name, 'has disconnected.');
-    const video = document.getElementById(userId);
+    const video = document.getElementById(userId).parentNode;
     video.remove();
 });
 

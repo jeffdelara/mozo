@@ -59,12 +59,12 @@ io.on('connection', socket => {
     // Screenshare
     socket.on('start-screenshare', ({roomId, userId, chatName}) => {
         console.log(roomId, userId, chatName);
-        io.to(roomId).emit('screenshare-broadcast-start', chatName, userId);
+        socket.to(roomId).emit('screenshare-broadcast-start', chatName, userId);
     });
 
     socket.on('end-screenshare', ({roomId, userId, chatName}) => {
         console.log(roomId, userId, chatName);
-        io.to(roomId).emit('screenshare-broadcast-end', chatName, userId);
+        socket.to(roomId).emit('screenshare-broadcast-end', chatName, userId);
     });
 
     socket.on('disconnect', () => {

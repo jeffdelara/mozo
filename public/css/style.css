@@ -97,13 +97,12 @@ video {
     /* height: 240px; */
     object-fit: cover;
     
-    margin: .5rem;
     background-color: rgb(34, 42, 53, .3);
-    aspect-ratio: 16 / 12;
+    aspect-ratio: 16 / 9;
 }
 video.mini {
     max-width: 200px;
-    aspect-ratio: 16 / 12;
+    aspect-ratio: 16 / 9;
     order: 99;
 }
 video.screensharing {
@@ -114,12 +113,14 @@ video.screensharing {
 
 .vid-container {
     position: relative;
+    margin: .5rem;
+    aspect-ratio: 16 / 9;
 }
 
 .vid-container span {
     position: absolute;
-    bottom: 3%;
-    left: 5px;
+    bottom: 0;
+    left: 0;
     display: inline-block;
     color: white;
     background-color: rgba(0, 0, 0, .5);
