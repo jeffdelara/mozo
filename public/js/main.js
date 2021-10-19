@@ -48,7 +48,7 @@ navigator.mediaDevices.getUserMedia({
         const callerName = call.metadata.chatName;
         const screenSharing = call.metadata.isScreenSharing;
         const callerId = call.metadata.callerId;
-        console.log({callerName, screenSharing, callerId});
+
         call.answer(currentStream);
         call.on('stream', (remoteStream) => {
             if(!peers[call.peer])
@@ -76,6 +76,7 @@ navigator.mediaDevices.getUserMedia({
     // when a new user join, call him
     socket.on('user-joined', (userId, name) => {
         notifyChat(name, 'has joined the chat.');
+
         // call new user with my chatName
         const callerId = localStorage.getItem('userId');
         const meta = { chatName: chatName, callerId: callerId, isScreenSharing: isScreenSharing };
@@ -309,11 +310,11 @@ function changeVideoForScreenShare(userId, type)
 
 // When a peer started to share screen
 socket.on('screenshare-broadcast-start', (chatName, userId) => {
-    linkNotif(`${chatName} is screensharing.`);
+    linkNotif(`<b>${chatName}</b> is screensharing.`);
     changeVideoForScreenShare(userId, 'start');
 });
 
 socket.on('screenshare-broadcast-end', (chatName, userId) => {
-    linkNotif(`${chatName} ended screen share.`);
+    linkNotif(`<b>${chatName}</b> ended screen share.`);
     changeVideoForScreenShare(userId, 'end');
 });
