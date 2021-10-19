@@ -16,12 +16,12 @@ inviteBtn.addEventListener('click', () => {
 function linkNotif(message)
 {
     notification.innerText = '';
-    notification.innerText = message;
+    notification.innerHTML = message;
     notification.classList.add('shownotif');
 
     setTimeout(() => {
         notification.classList.remove('shownotif');
-    }, 3000);
+    }, 4000);
 }
 
 

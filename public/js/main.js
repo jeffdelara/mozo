@@ -9,6 +9,9 @@ var socket = io('/');
 const peer = new Peer(undefined);
 let peers = {};
 let currentStream = null;
+let screenStream = null; 
+let isScreenSharing = false;
+let camStream = null;
 let currentCall = null;
 
 // Todo: get user's name, emit to server
@@ -29,11 +32,11 @@ peer.on('open', (id) => {
 // For streaming::
 // get permission to use video and audio
 navigator.mediaDevices.getUserMedia({
-    video: true, 
-    audio: true
+    video: true 
+    // audio: true
 }).then(stream => {
     currentStream = stream;
-    camAndAudioStream = stream;
+    camStream = stream;
     const video = document.createElement('video');
     video.muted = true;
     showVideo(video, stream);
@@ -43,15 +46,23 @@ navigator.mediaDevices.getUserMedia({
     peer.on('call', (call) => {
         currentCall = call;
         const callerName = call.metadata.chatName;
+        const screenSharing = call.metadata.isScreenSharing;
+        const callerId = call.metadata.callerId;
 
         call.answer(currentStream);
         call.on('stream', (remoteStream) => {
             if(!peers[call.peer])
             {
                 const video = document.createElement('video');
-                video.id = call.peer;
+                video.id = callerId;
+                
                 showVideo(video, remoteStream, callerName);
                 peers[call.peer] = call;
+
+                if(screenSharing) {
+                    video.classList.add('screensharing');
+                    changeVideoForScreenShare(callerId, 'start');
+                }
             }
         });
 
@@ -65,16 +76,23 @@ navigator.mediaDevices.getUserMedia({
     // when a new user join, call him
     socket.on('user-joined', (userId, name) => {
         notifyChat(name, 'has joined the chat.');
+
         // call new user with my chatName
-        const call = peer.call(userId, currentStream, { metadata: { chatName: chatName } });
+        const callerId = localStorage.getItem('userId');
+        const meta = { chatName: chatName, callerId: callerId, isScreenSharing: isScreenSharing };
+        const call = peer.call(userId, currentStream, { metadata: meta });
 
         call.on('stream', (remoteStream) => {
             if(!peers[call.peer]) {
-                console.log('peer call');
                 const video = document.createElement('video');
                 video.id = userId;
+
                 showVideo(video, remoteStream, name);
                 peers[call.peer] = call;
+
+                if(isScreenSharing) {
+                    replaceStream(screenStream);                    
+                }
             }
             
         });
@@ -90,6 +108,31 @@ navigator.mediaDevices.getUserMedia({
 // -------------------------------------------------------------------------------
 //  Utility functions
 
+function replaceStream(newStream)
+{
+    // Replace current stream with display media
+    const myPeers = Object.keys(peers);
+    if(myPeers.length > 0) {
+        
+        const replaceCamPromise = new Promise( (resolve, reject) => {
+            for(peerId of myPeers) {
+                peers[peerId].peerConnection.getSenders().map( sender => {
+                    if(sender.track.kind === newStream.getVideoTracks()[0].kind) {
+                        resolve(sender.replaceTrack(newStream.getVideoTracks()[0]));
+                    }
+                });
+            }
+        });
+
+        replaceCamPromise
+            .then((msg) => {
+                console.log(msg);
+            })
+            .catch(err => console.log(err));
+    } 
+
+}
+
 function startScreenShare()
 {
     const options = {
@@ -98,6 +141,8 @@ function startScreenShare()
     };
     navigator.mediaDevices.getDisplayMedia(options)
         .then(displayStream => {
+            isScreenSharing = true;
+            screenStream = displayStream;
 
             displayStream.getVideoTracks()[0].addEventListener('ended', () => {
                 stopScreenShare();
@@ -107,20 +152,7 @@ function startScreenShare()
             const myPeers = Object.keys(peers);
             if(myPeers.length > 0) {
                 
-                const replaceCamPromise = new Promise( (resolve, reject) => {
-                    for(peerId of myPeers) {
-                        peers[peerId].peerConnection.getSenders().map( sender => {
-                            resolve(sender.replaceTrack(displayStream.getVideoTracks()[0]));
-                        });
-                    }
-                });
-    
-                replaceCamPromise
-                    .then((msg) => {
-                        console.log(msg);
-                    })
-                    .catch(err => console.log(err));
-    
+                replaceStream(displayStream);
                 toggleCamera();
                 toggleScreenShareButton('ON');
 
@@ -144,7 +176,9 @@ function stopScreenShare()
     const replaceScreenPromise = new Promise((resolve, reject) => {
         for(peerId of myPeers) {
             peers[peerId].peerConnection.getSenders().map(sender => {
-                resolve(sender.replaceTrack(currentStream.getVideoTracks()[0]))
+                if(sender.track.kind === currentStream.getVideoTracks()[0].kind) {
+                    resolve(sender.replaceTrack(currentStream.getVideoTracks()[0]))
+                }
             });
         }
     });
@@ -253,26 +287,34 @@ socket.on('user-disconnect', (userId, name) => {
 // -------------------------------------------------------------------------------
 // Socket events 
 
-function changeVideoForScreenShare(userId)
+function changeVideoForScreenShare(userId, type)
 {
-    
     const videos = document.querySelectorAll('#video-grid video');
     videos.forEach(vid => {
-        vid.classList.toggle('mini');
+        if(type === 'start') {
+            vid.classList.add('mini');
+        } else if(type === 'end') {
+            vid.classList.remove('mini');
+        }
     });
 
     const screenSharingUser = document.getElementById(userId);
-    console.log(userId);
-    screenSharingUser.classList.toggle('screensharing');
+    if(screenSharingUser) {
+        if(type === 'start') {
+            screenSharingUser.classList.add('screensharing');
+        } else if(type === 'end') {
+            screenSharingUser.classList.remove('screensharing');
+        }
+    }
 }
 
 // When a peer started to share screen
 socket.on('screenshare-broadcast-start', (chatName, userId) => {
-    linkNotif(`${chatName} is screensharing.`);
-    changeVideoForScreenShare(userId);
+    linkNotif(`<b>${chatName}</b> is screensharing.`);
+    changeVideoForScreenShare(userId, 'start');
 });
 
 socket.on('screenshare-broadcast-end', (chatName, userId) => {
-    linkNotif(`${chatName} ended screen share.`);
-    changeVideoForScreenShare(userId);
+    linkNotif(`<b>${chatName}</b> ended screen share.`);
+    changeVideoForScreenShare(userId, 'end');
 });
