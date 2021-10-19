@@ -32,8 +32,8 @@ peer.on('open', (id) => {
 // For streaming::
 // get permission to use video and audio
 navigator.mediaDevices.getUserMedia({
-    video: true, 
-    audio: true
+    video: true 
+    // audio: true
 }).then(stream => {
     currentStream = stream;
     camStream = stream;
@@ -46,16 +46,23 @@ navigator.mediaDevices.getUserMedia({
     peer.on('call', (call) => {
         currentCall = call;
         const callerName = call.metadata.chatName;
-
+        const screenSharing = call.metadata.isScreenSharing;
+        const callerId = call.metadata.callerId;
+        console.log({callerName, screenSharing, callerId});
         call.answer(currentStream);
         call.on('stream', (remoteStream) => {
             if(!peers[call.peer])
             {
                 const video = document.createElement('video');
-                // video.id = call.peer;
-                video.id = call.metadata.callerId;
+                video.id = callerId;
+                
                 showVideo(video, remoteStream, callerName);
                 peers[call.peer] = call;
+
+                if(screenSharing) {
+                    video.classList.add('screensharing');
+                    changeVideoForScreenShare(callerId, 'start');
+                }
             }
         });
 
@@ -71,7 +78,8 @@ navigator.mediaDevices.getUserMedia({
         notifyChat(name, 'has joined the chat.');
         // call new user with my chatName
         const callerId = localStorage.getItem('userId');
-        const call = peer.call(userId, currentStream, { metadata: { chatName: chatName, callerId: callerId} });
+        const meta = { chatName: chatName, callerId: callerId, isScreenSharing: isScreenSharing };
+        const call = peer.call(userId, currentStream, { metadata: meta });
 
         call.on('stream', (remoteStream) => {
             if(!peers[call.peer]) {
@@ -82,12 +90,7 @@ navigator.mediaDevices.getUserMedia({
                 peers[call.peer] = call;
 
                 if(isScreenSharing) {
-                    replaceStream(screenStream);
-                    const callerId = localStorage.getItem('userId');
-                    setTimeout(function(){
-                        socket.emit('start-screenshare', {roomId: ROOMID, userId: callerId, chatName: chatName});
-                    }, 1000);
-                    
+                    replaceStream(screenStream);                    
                 }
             }
             
@@ -295,10 +298,12 @@ function changeVideoForScreenShare(userId, type)
     });
 
     const screenSharingUser = document.getElementById(userId);
-    if(type === 'start') {
-        screenSharingUser.classList.add('screensharing');
-    } else if(type === 'end') {
-        screenSharingUser.classList.remove('screensharing');
+    if(screenSharingUser) {
+        if(type === 'start') {
+            screenSharingUser.classList.add('screensharing');
+        } else if(type === 'end') {
+            screenSharingUser.classList.remove('screensharing');
+        }
     }
 }
 
