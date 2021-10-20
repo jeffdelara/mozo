@@ -1,11 +1,20 @@
 # Mozo the video chat app
 
-Mozo is a real-time video chat application that allows you to share your webcam, speaker and screen with other people in the chat room.
+![Mozo video conference chat app](public/images/cover.png)
 
+Mozo is a real-time video conferencing and chat application that allows you to share your webcam, speaker and screen with other people in the chat room.
+
+[Live demo](https://mozoapp.herokuapp.com/) 
+
+## Goal of this Project
+I got interested with WebSockets and built a simple chat app (https://github.com/jeffdelara/chatapp). Mozo is an upgrade from that knowledge using WebSockets for chat together with WebRTC for the video conferencing.
+## Tech Stack
 The project is created with the following tech stack: 
-- Nodejs with Express
+- HTML/CSS and Javascript
+- NodeJS with Express
 - WebRTC
-- Socket.io
+- SocketIO
+- Heroku
 
 ## Features: 
 - Share webcam video
@@ -13,6 +22,5 @@ The project is created with the following tech stack:
 - Chat feature
 - Share screen feature
 
-## Todo: 
-- Share screen will full screen other viewer's video.
-- Testing of webcam before joining a room as well as instructions on allowing the camera permissions.
+## Todo (Work in Progress): 
+- Create an End Screenshare button because on Safari, there is no end screenshare 

@@ -211,7 +211,7 @@ section h1 {
 }
 
 #hero {
-    height: 75vh;
+    height: 70vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
