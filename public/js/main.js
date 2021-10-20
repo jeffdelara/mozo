@@ -192,6 +192,7 @@ function stopScreenShare()
 
     const userId = localStorage.getItem('userId');
     socket.emit('end-screenshare', {roomId: ROOMID, userId: userId, chatName: chatName});
+    isScreenSharing = false;
 }
 
 function changeVideoForScreenShare(userId, type)
