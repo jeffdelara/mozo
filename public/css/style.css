@@ -411,7 +411,7 @@ button.btn-second:hover {
     background-color: rgba(45, 140, 255, .2);
     color: var(--dark-primary-color);
     border-radius: 3px;
-    padding: .3rem;
+    padding: 1rem .3rem;
 }
 
 .on {
@@ -424,4 +424,10 @@ button.btn-second:hover {
 
 .hide {
     visibility: hidden;
+}
+
+input:disabled, button:disabled {
+    background-color: #EEE;
+    color: var(--text-color);
+    border: 1px solid #EEE;
 }

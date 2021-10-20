@@ -299,6 +299,7 @@ socket.on('chat-broadcast', (name, message) => {
 // -------------------------------------------------------------------------------
 // When user disconnects
 socket.on('user-disconnect', (userId, name) => {
+    changeVideoForScreenShare(userId, 'end');
     notifyChat(name, 'has disconnected.');
     const video = document.getElementById(userId).parentNode;
     video.remove();

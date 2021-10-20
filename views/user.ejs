@@ -13,12 +13,15 @@
         <div class="container">
             <div class="card">
                 <div class="info">Please allow permission to webcam and audio if asked.</div>
-                <div id="video-placeholder">
-                </div>
-                <h2>What is your name?</h2>
-                <div><input type="text" id="name-input" name="name" autocomplete="off" required placeholder="Enter your name..."></div>
-                <div>
-                    <button id="modal-join-room">Join room</button>
+                <div id="form">
+                    <div id="video-placeholder">
+                    </div>
+                
+                    <h2>What is your name?</h2>
+                    <div><input type="text" id="name-input" name="name" autocomplete="off" required placeholder="Enter your name..."></div>
+                    <div>
+                        <button id="modal-join-room">Join room</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -45,6 +48,8 @@
             }
         });
 
+        const info = document.querySelector('.info');
+
         function askMediaPermission()
         {
             const options = { video: true, audio: true };
@@ -63,11 +68,18 @@
 
                     const cam = stream.getVideoTracks();
                     const speaker = stream.getAudioTracks();
-                    console.log({cam, speaker});
+                    info.style.display = 'none';
                 })
                 .catch(err => {
                     // when permission denied
-                    console.log(err);
+                    nameInput.disabled = true; 
+                    joinBtn.disabled = true;
+
+                    const form = document.getElementById('form');
+                    form.style.display = 'none';
+
+                    const message = `<b>Allow Camera and Audio</b><br>Please refresh your page or clear your cache to allow permission again.`
+                    info.innerHTML = message;
                 });
         }
 
