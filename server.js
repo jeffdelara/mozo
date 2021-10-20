@@ -10,6 +10,17 @@ server.listen(port);
 app.set('view engine', 'ejs');
 app.use(express.static('public')); // use the static folder public
 
+// Force SSL on Heroku
+if(process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        if(req.header('x-forwarded-proto') !== 'https') {
+            res.redirect(`https://${req.header('host')}${req.url}`);
+        } else {
+            next();
+        }
+    });
+}
+
 // ----------------------------------------------------------------------
 // Dynamic pages
 
