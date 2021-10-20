@@ -12,6 +12,9 @@
     <main id="name">
         <div class="container">
             <div class="card">
+                <div class="info">Please allow permission to webcam and audio if asked.</div>
+                <div id="video-placeholder">
+                </div>
                 <h2>What is your name?</h2>
                 <div><input type="text" id="name-input" name="name" autocomplete="off" required placeholder="Enter your name..."></div>
                 <div>
@@ -41,6 +44,26 @@
                 window.location.replace(`/${roomId}`);
             }
         });
+
+        function askMediaPermission()
+        {
+            const options = { video: true, audio: true };
+            navigator.mediaDevices.getUserMedia(options)
+                .then(stream => {
+                    const video = document.createElement('video');
+                    video.muted = true;
+                    video.srcObject = stream;
+
+                    const videoPlaceHolder = document.getElementById('video-placeholder');
+                    videoPlaceHolder.append(video);
+
+                    video.addEventListener('loadedmetadata', () => {
+                        video.play();
+                    });
+                });
+        }
+
+        askMediaPermission();
     </script>
 </body>
 </html>

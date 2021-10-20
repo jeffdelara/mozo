@@ -32,8 +32,8 @@ peer.on('open', (id) => {
 // For streaming::
 // get permission to use video and audio
 navigator.mediaDevices.getUserMedia({
-    video: true 
-    // audio: true
+    video: true,
+    audio: true
 }).then(stream => {
     currentStream = stream;
     camStream = stream;
@@ -61,14 +61,12 @@ navigator.mediaDevices.getUserMedia({
 
                 if(screenSharing) {
                     video.classList.add('screensharing');
+                    linkNotif(`<b>${callerName}</b> is screensharing`);
                     changeVideoForScreenShare(callerId, 'start');
                 }
             }
         });
 
-        currentCall.ontrack = function(event) {
-            console.log('Track', event);
-        }
     });
 
 
@@ -196,6 +194,27 @@ function stopScreenShare()
     socket.emit('end-screenshare', {roomId: ROOMID, userId: userId, chatName: chatName});
 }
 
+function changeVideoForScreenShare(userId, type)
+{
+    const videos = document.querySelectorAll('#video-grid video');
+    videos.forEach(vid => {
+        if(type === 'start') {
+            vid.classList.add('mini');
+        } else if(type === 'end') {
+            vid.classList.remove('mini');
+        }
+    });
+
+    const screenSharingUser = document.getElementById(userId);
+    if(screenSharingUser) {
+        if(type === 'start') {
+            screenSharingUser.classList.add('screensharing');
+        } else if(type === 'end') {
+            screenSharingUser.classList.remove('screensharing');
+        }
+    }
+}
+
 function toggleCamera()
 {
     const vid = currentStream.getVideoTracks();
@@ -235,6 +254,7 @@ function showVideo(video, stream, chatName = 'You')
     video.addEventListener('loadedmetadata', () => {
         div.append(video);
         videoGrid.append(div);
+        console.log('Loaded');
         video.play();
     });
 }
@@ -286,27 +306,6 @@ socket.on('user-disconnect', (userId, name) => {
 
 // -------------------------------------------------------------------------------
 // Socket events 
-
-function changeVideoForScreenShare(userId, type)
-{
-    const videos = document.querySelectorAll('#video-grid video');
-    videos.forEach(vid => {
-        if(type === 'start') {
-            vid.classList.add('mini');
-        } else if(type === 'end') {
-            vid.classList.remove('mini');
-        }
-    });
-
-    const screenSharingUser = document.getElementById(userId);
-    if(screenSharingUser) {
-        if(type === 'start') {
-            screenSharingUser.classList.add('screensharing');
-        } else if(type === 'end') {
-            screenSharingUser.classList.remove('screensharing');
-        }
-    }
-}
 
 // When a peer started to share screen
 socket.on('screenshare-broadcast-start', (chatName, userId) => {
