@@ -60,6 +60,14 @@
                     video.addEventListener('loadedmetadata', () => {
                         video.play();
                     });
+
+                    const cam = stream.getVideoTracks();
+                    const speaker = stream.getAudioTracks();
+                    console.log({cam, speaker});
+                })
+                .catch(err => {
+                    // when permission denied
+                    console.log(err);
                 });
         }
 
