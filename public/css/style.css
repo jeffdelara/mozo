@@ -97,7 +97,6 @@ video {
     /* height: 240px; */
     object-fit: cover;
     border-radius: .3rem;
-    
     background-color: rgb(34, 42, 53, .3);
     aspect-ratio: 16 / 12;
 }
@@ -387,9 +386,32 @@ button.btn-second:hover {
     transition: opacity .3s;
 }
 
+#video-placeholder {
+    width: 340px;
+    height: 240px;
+    background-color: #EEE;
+    border-radius: .3rem;
+    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem auto;
+}
+
+#video-placeholder video {
+    width: 100%;
+}
+
 .shownotif {
     transition: opacity .3s ease-in;
     opacity: 1 !important;
+}
+
+.info {
+    background-color: rgba(45, 140, 255, .2);
+    color: var(--dark-primary-color);
+    border-radius: 3px;
+    padding: .3rem;
 }
 
 .on {
